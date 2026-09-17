@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>iPod</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Tocador de MP3 com a interface e a experiência do iPod Classic.">
+<meta name="theme-color" content="#0b0b0c">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="iPod">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192">
+<link rel="stylesheet" href="css/ipod.css">
+</head>
+<body>
+
+<!-- ============ CORPO DO APARELHO ============ -->
+<div class="ipod" id="ipod" data-theme="graphite">
+  <div class="ipod__body">
+
+    <!-- ---------- TELA ---------- -->
+    <div class="screen-frame">
+      <div class="screen" id="screen" aria-live="polite">
+
+        <!-- barra de titulo -->
+        <header class="statusbar" id="statusbar">
+          <div class="statusbar__left">
+            <svg class="sb-icon" id="sb-play" viewBox="0 0 12 12" aria-hidden="true">
+              <path class="sb-icon__play" d="M2 1.5v9l8-4.5z"/>
+              <g class="sb-icon__pause"><rect x="2" y="1.5" width="3" height="9"/><rect x="7" y="1.5" width="3" height="9"/></g>
+            </svg>
+          </div>
+          <h1 class="statusbar__title" id="sb-title">iPod</h1>
+          <div class="statusbar__right">
+            <span class="sb-clock" id="sb-clock"></span>
+            <span class="battery" id="sb-battery"><i></i></span>
+          </div>
+        </header>
+
+        <!-- area de conteudo (as views sao injetadas aqui) -->
+        <div class="viewport" id="viewport"></div>
+
+        <!-- overlay de volume / brilho / mensagens -->
+        <div class="toast" id="toast" hidden></div>
+      </div>
+      <div class="screen-glass" aria-hidden="true"></div>
+    </div>
+
+    <!-- ---------- CLICK WHEEL ---------- -->
+    <div class="wheel-area">
+      <div class="wheel" id="wheel" role="application" aria-label="Click Wheel">
+        <div class="wheel__ring" aria-hidden="true"></div>
+        <button class="wheel__btn wheel__btn--menu" data-btn="menu" type="button" aria-label="Menu"><span>MENU</span></button>
+        <button class="wheel__btn wheel__btn--prev" data-btn="prev" type="button" aria-label="Anterior">
+          <svg class="gl gl-side" viewBox="0 0 26 14" aria-hidden="true"><rect x="0" y="1" width="3.2" height="12" rx="1"/><path d="M14 1v12L5 7z"/><path d="M25 1v12l-9-6z"/></svg>
+        </button>
+        <button class="wheel__btn wheel__btn--next" data-btn="next" type="button" aria-label="Proxima">
+          <svg class="gl gl-side" viewBox="0 0 26 14" aria-hidden="true"><path d="M1 1v12l9-6z"/><path d="M12 1v12l9-6z"/><rect x="22.8" y="1" width="3.2" height="12" rx="1"/></svg>
+        </button>
+        <button class="wheel__btn wheel__btn--play" data-btn="playpause" type="button" aria-label="Tocar ou pausar">
+          <svg class="gl gl-play" viewBox="0 0 30 14" aria-hidden="true"><path d="M0 1v12l10-6z"/><rect x="15.5" y="1" width="4" height="12" rx="1"/><rect x="23" y="1" width="4" height="12" rx="1"/></svg>
+        </button>
+        <button class="wheel__center" id="wheel-center" data-btn="center" type="button" aria-label="Selecionar"></button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- entrada de arquivos (aberta pelo menu Adicionar Musicas) -->
+<input type="file" id="file-input" multiple accept="audio/*,.mp3,.m4a,.aac,.wav,.flac,.ogg,.oga,.opus,.m4b" hidden>
+
+<audio id="audio" preload="metadata" playsinline></audio>
+
+<script type="module" src="js/app.js"></script>
+<noscript><p style="color:#fff;font:16px sans-serif;padding:24px">Este aplicativo precisa de JavaScript.</p></noscript>
+</body>
+</html>
