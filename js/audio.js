@@ -198,6 +198,41 @@ export async function prev() {
   await loadCurrent(true);
 }
 
+/**
+ * Retira uma faixa da fila atual. Usada quando a musica e apagada da
+ * biblioteca: se for a que esta tocando, a reproducao para e a tela
+ * "Tocando Agora" volta ao estado vazio.
+ */
+export function forgetTrack(id) {
+  if (!state.queue.includes(id)) return;
+
+  if (state.trackId === id) {
+    el.pause();
+    state.playing = false;
+    el.removeAttribute('src');
+    try { el.load(); } catch (_) { /* noop */ }
+    if (objectUrl) { URL.revokeObjectURL(objectUrl); objectUrl = null; }
+    state.trackId = null;
+  }
+
+  state.queue = state.queue.filter((q) => q !== id);
+
+  if (!state.queue.length) {
+    state.order = [];
+    state.pos = -1;
+    state.trackId = null;
+  } else {
+    // mantem a faixa atual na fila reconstruida, quando ela sobreviveu
+    const keep = state.trackId ? state.queue.indexOf(state.trackId) : -1;
+    buildOrder(keep >= 0 ? keep : 0);
+    if (keep < 0) state.trackId = null;
+  }
+
+  emit('track', currentTrack());
+  emit('state', state);
+  scheduleSave();
+}
+
 export function seek(seconds) {
   if (!Number.isFinite(seconds) || !el.duration) return;
   el.currentTime = Math.max(0, Math.min(el.duration, seconds));

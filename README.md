@@ -66,7 +66,7 @@ Arquivos que o navegador não consegue decodificar são importados mas sinalizad
 | Girar em **Tocando Agora** | Volume |
 | **Centro** | Selecionar / tocar |
 | **Centro** em Tocando Agora | Alterna: Volume → Avançar/Retroceder → Avaliação (estrelas) |
-| **Centro** (segurar) sobre uma música | Adiciona à playlist **Lista Rápida** |
+| **Centro** (segurar) sobre uma música | Abre as ações da faixa: **Adicionar à Lista Rápida** ou **Apagar Música** |
 | **MENU** | Voltar |
 | **MENU** (segurar) | Volta direto ao menu principal |
 | **▶❙❙** | Tocar / pausar |
@@ -156,6 +156,8 @@ O quota do Safari para um site é de alguns GB e varia com o espaço livre do ap
 
 Fotos, vídeos, jogos, notas, rádio, sincronização com iTunes e equalizador não foram implementados. Playlists têm criação via "Lista Rápida" (segurar o botão central sobre uma música); não há editor completo de playlists.
 
+Ao apagar uma música, a lista aberta é reconstruída na hora. Telas já empilhadas atrás dela (a lista de álbuns, por exemplo) só refletem a mudança quando abertas de novo — faixas ausentes são sempre filtradas, então nada quebra, apenas a contagem exibida pode ficar desatualizada até voltar ao menu.
+
 ---
 
 ## 6. Publicação
@@ -194,6 +196,7 @@ O projeto inclui dois níveis de verificação, executados durante o desenvolvim
 | Prioridade | Item | Motivo |
 |---|---|---|
 | Alta | Editor de playlists completo | Única funcionalidade central do iPod ainda parcial |
+| Média | Apagar álbum ou artista inteiro | Hoje a exclusão é faixa a faixa ou biblioteca inteira |
 | Alta | Importar pasta inteira (`webkitdirectory`) | Reduz o atrito de montar a biblioteca no desktop |
 | Média | Equalizador (Web Audio `BiquadFilter`) | Presente no original; baixo custo de implementação |
 | Média | Exportar/importar a biblioteca | Mitiga o risco de perda descrito em 5.3 |

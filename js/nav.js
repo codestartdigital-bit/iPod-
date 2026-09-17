@@ -59,6 +59,24 @@ export function pop() {
   return true;
 }
 
+/** Profundidade atual da pilha (a tela do topo esta nesta posicao). */
+export const depth = () => stack.length;
+
+/** Descarta telas ate a profundidade alvo sem remontar (uso interno). */
+function popSilent(target) {
+  while (stack.length > Math.max(1, target)) {
+    const v = stack.pop();
+    v.root.remove();
+    if (v.destroy) v.destroy();
+  }
+}
+
+/** Volta ate a profundidade alvo e remonta a tela que ficou no topo. */
+export function popTo(target) {
+  popSilent(target);
+  if (stack.length) mount(current());
+}
+
 export function home() {
   while (stack.length > 1) {
     const v = stack.pop();
@@ -317,26 +335,70 @@ export function buildSongsMenu() {
  */
 function buildTrackList(ids, title, opts) {
   const o = opts || {};
-  const items = ids.map((id, i) => {
+  const live = ids.filter((id) => lib.getTrack(id));
+
+  const items = live.map((id, i) => {
     const t = lib.getTrack(id);
-    if (!t) return null;
     return {
       label: t.title,
       value: o.showArtist ? t.artist : fmtTime(t.duration),
       num: o.numbered ? (t.trackNo || i + 1) : undefined,
       playing: player.state.trackId === id,
       preview: { art: t.albumKey, t1: t.title, t2: `${t.artist} · ${t.album}` },
-      onSelect: () => playTracks(ids, i, title),
-      onPlay: () => playTracks(ids, i, title),
-      onHold: () => addToOnTheGo(t),
+      onSelect: () => playTracks(live, i, title),
+      onPlay: () => playTracks(live, i, title),
+      // segurar o centro abre as acoes da faixa (a lista esta no topo agora)
+      onHold: () => push(buildTrackActions(t, live, i, title, o, depth())),
     };
-  }).filter(Boolean);
+  });
 
   return createListView({
     title, items,
+    selected: o.selected || 0,
     emptyTitle: 'Sem musicas',
     emptyText: 'Adicione musicas em Ajustes > Adicionar Musicas.',
   });
+}
+
+/* ------------------------------------------------- acoes sobre a faixa */
+
+function buildTrackActions(track, ids, idx, title, opts, listDepth) {
+  const items = [
+    {
+      label: `Adicionar a ${ONTHEGO}`,
+      onSelect: () => { addToOnTheGo(track); pop(); },
+    },
+    {
+      label: 'Apagar Musica',
+      chev: true,
+      onSelect: () => push(buildConfirm(
+        'Apagar esta musica?', 'Apagar',
+        () => removeTrackAndRefresh(track, ids, idx, title, opts, listDepth)
+      )),
+    },
+  ];
+  return createListView({ title: track.title, items, split: false });
+}
+
+/**
+ * Apaga a faixa da biblioteca e volta para a lista, ja sem ela.
+ * As telas anteriores (albuns, artistas) sao remontadas ao serem abertas
+ * de novo, e faixas ausentes sao sempre filtradas na abertura da lista.
+ */
+async function removeTrackAndRefresh(track, ids, idx, title, opts, listDepth) {
+  player.forgetTrack(track.id);
+  await lib.removeTrack(track.id);
+
+  const remaining = ids.filter((id) => id !== track.id && lib.getTrack(id));
+  if (!remaining.length) {
+    popTo(listDepth - 1);            // a lista ficou vazia: sobe um nivel
+  } else {
+    popSilent(listDepth - 1);        // descarta confirmacao, acoes e lista antiga
+    push(buildTrackList(remaining, title, Object.assign({}, opts, {
+      selected: Math.min(idx, remaining.length - 1),
+    })));
+  }
+  toast('Musica apagada');
 }
 
 async function addToOnTheGo(track) {
@@ -386,7 +448,7 @@ export function buildPlaylistsMenu() {
   return createListView({
     title: 'Playlists', items,
     emptyTitle: 'Sem playlists',
-    emptyText: `Segure o botao central sobre uma musica para criar a "${ONTHEGO}".`,
+    emptyText: `Segure o botao central sobre uma musica e escolha "Adicionar a ${ONTHEGO}".`,
   });
 }
 
